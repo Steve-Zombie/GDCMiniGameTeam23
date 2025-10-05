@@ -15,6 +15,7 @@ public class BookshelfSlot : MonoBehaviour, IDropHandler
         Debug.Log(dropped);
         DraggableItem dItem = dropped.GetComponent<DraggableItem>();
         curr_item = dItem.Item;
+        UpdateSprite(curr_item.sprite);
     }
 
     public void UpdateSprite(Sprite sprite)
