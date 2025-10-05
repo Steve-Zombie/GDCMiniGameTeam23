@@ -41,7 +41,4 @@ public class Bookshelf : MonoBehaviour
         }
         return true;
     }
-
-
-
 }

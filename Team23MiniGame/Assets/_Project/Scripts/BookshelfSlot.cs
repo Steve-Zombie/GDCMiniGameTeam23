@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -12,9 +13,14 @@ public class BookshelfSlot : MonoBehaviour, IDropHandler
     {
         GameObject dropped = eventData.pointerDrag;
         Debug.Log(dropped);
-        Item item = dropped.GetComponent<Item>();
-        curr_item = item;
-        //gameObject.sprite = item.sprite;
+        DraggableItem dItem = dropped.GetComponent<DraggableItem>();
+        curr_item = dItem.Item;
+    }
 
+    public void UpdateSprite(Sprite sprite)
+    {
+        if (sprite == null) return;
+
+        gameObject.GetComponent<Image>().sprite = sprite;
     }
 }
