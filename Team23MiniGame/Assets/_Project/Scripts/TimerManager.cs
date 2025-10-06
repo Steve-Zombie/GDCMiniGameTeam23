@@ -3,29 +3,43 @@ using System.Collections.Generic;
 using System.Timers;
 using UnityEngine;
 
-public class TimerManager : MonoBehaviour
+public class TimerManager : MonoBehaviour, MinigameSubscriber
 {
     public List<Timer> Timers;
-    private Coroutine currentCoroutineForTimer;
-    public void StartTimer(int index)
+
+    public void OnMinigameStart()
     {
-        if (index < 0 || index >= Timers.Count)
+        StartTimers(0);
+    }
+
+    public void OnTimerEnd()
+    {
+       // throw new System.NotImplementedException();
+    }
+
+    public void StartTimers(int index)
+    {
+        if (Timers.Count <= 0)
         {
             return;
         }
 
-       if (currentCoroutineForTimer != null)
-            StopCoroutine(currentCoroutineForTimer);
-
-        currentCoroutineForTimer = StartCoroutine(RunningTimer(Timers[index]));
+        StartCoroutine(RunningTimer(index));
     }
         
 
-    private IEnumerator RunningTimer(Timer timer)
+    private IEnumerator RunningTimer(int index)
     {
-        timer.OnGameStartEvent.Invoke();
+        Timer timer = Timers[index];
+        timer.OnTimerStartEvent.Invoke();
         yield return new WaitForSeconds(timer.duration);
-        timer.OnGameEndEvent.Invoke();
+        timer.OnTimerEndEvent.Invoke();
+
+        int nextIndex = index + 1;
+        if (nextIndex < Timers.Count)
+        {
+            StartCoroutine(RunningTimer(nextIndex));
+        }
     }
 
 }

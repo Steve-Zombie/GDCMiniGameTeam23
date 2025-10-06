@@ -4,14 +4,10 @@ using UnityEngine.Events;
 [Serializable]
 public class Timer
 {
+    public String name;
     public float duration;
-    public UnityEvent OnGameStartEvent;
-    public UnityEvent OnGameEndEvent;
+    public UnityEvent OnTimerStartEvent;
+    public UnityEvent OnTimerEndEvent;
 
-    public Timer(float duration)
-    {
-        this.duration = duration;
-        OnGameStartEvent = new UnityEvent();
-        OnGameEndEvent = new UnityEvent();
-    }
+
 }
