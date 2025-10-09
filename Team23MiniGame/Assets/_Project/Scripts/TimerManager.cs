@@ -28,7 +28,6 @@ public class TimerManager : MonoBehaviour
         timer.OnTimerStartEvent.Invoke();
         yield return new WaitForSeconds(timer.duration);
         timer.OnTimerEndEvent.Invoke();
-        Debug.Log($"Timer '{timer.name}' ended");
 
         int nextIndex = index + 1;
 

@@ -24,12 +24,15 @@ public class GameManager : MonoBehaviour, MinigameSubscriber
         {
             Debug.LogError("Timer Not Found");
         }
+        hotbar.Show(false);
+
     }
 
     public void OnMinigameStart()
     {
         OnMemorizationStart();
         timerManager.StartTimers(0);
+
     }
 
     public void OnTimerEnd()
@@ -69,16 +72,16 @@ public class GameManager : MonoBehaviour, MinigameSubscriber
         GenerateNewPuzzleSequence();
         bookshelf.UpdateShelf(memeorizedSequence.ToArray());
         playerSequence.Clear();
-        hotbar.Show(false);
 
     }
     public void OnMemorizationEnd()
     {
 
-        Debug.Log("Memorization timer ended.");
         bookshelf.ClearShelf();
         hotbar.Show(true);
         playerSequence = new List<Item>(new Item[bookshelf.slots.Length]);
+        Debug.Log("Memorization timer ended.");
+
 
     }
 
@@ -91,6 +94,8 @@ public class GameManager : MonoBehaviour, MinigameSubscriber
     {
         hotbar.Show(false);
         Evaluate();
+        Debug.Log("Player input phase ended.");
+
     }
 
 
