@@ -4,131 +4,67 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 
-public class GameManager : MonoBehaviour, MinigameSubscriber
+public class GameManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private enum MinigameState
+    {
+        READY,
+        PLAYING,
+        SUCCESS,
+        FAILURE
+    }
 
-    public List<Item> avaliableItems;
+    private MinigameState mstate = MinigameState.READY;
+
+    public List<Item> availableItems;
     public Bookshelf bookshelf;
-    public Hotbar hotbar;
 
-    private List<Item> memeorizedSequence = new List<Item>();
-    private List<Item> playerSequence = new List<Item>();
-
-    public  TimerManager timerManager;
-
-    void Awake()
+    private Item[] GenerateNewPuzzleSequence()
     {
-        MinigameManager.Subscribe(this);
-        if (timerManager == null)
-        {
-            Debug.LogError("Timer Not Found");
-        }
-        hotbar.Show(false);
-
-    }
-
-    public void OnMinigameStart()
-    {
-        OnMemorizationStart();
-        timerManager.StartTimers(0);
-
-    }
-
-    public void OnTimerEnd()
-    {
-        
-    }
-
-    void Start()
-    {
-
-    }
-
-
-    void GenerateNewPuzzleSequence()
-    {
-        memeorizedSequence.Clear();
-        playerSequence.Clear();
-
-        List<int> usedIndexes = new List<int>();
         int count = bookshelf.slots.Length;
+        Item[] res = new Item[count];
 
-        while (memeorizedSequence.Count < count)
+        for (int i = 0; i < count; i++)
         {
-            int randomIndex = Random.Range(0, avaliableItems.Count);
-            if (!usedIndexes.Contains(randomIndex))
-            {
-                usedIndexes.Add(randomIndex);
-                Debug.Log(usedIndexes.Count);
-                memeorizedSequence.Add(avaliableItems[randomIndex]);
-            }
+            int randomIndex = Random.Range(0, availableItems.Count);
+            res[i] = availableItems[randomIndex];
         }
+
+        return res;
     }
 
     public void OnMemorizationStart()
     {
-        Debug.Log("Memorization timer has Started.");
-        GenerateNewPuzzleSequence();
-        bookshelf.UpdateShelf(memeorizedSequence.ToArray());
-        playerSequence.Clear();
-
-    }
-    public void OnMemorizationEnd()
-    {
-
-        bookshelf.ClearShelf();
-        hotbar.Show(true);
-        playerSequence = new List<Item>(new Item[bookshelf.slots.Length]);
-        Debug.Log("Memorization timer ended.");
-
-
-    }
-
-    public void OnInputStart()
-    {
-       Debug.Log("Player input phase started.");
-    }
-
-    public void OnInputEnd()
-    {
-        hotbar.Show(false);
-        Evaluate();
-        Debug.Log("Player input phase ended.");
-
-    }
-
-
-    public void UpdatePlayerSequence(int slotIndex, Item selectedItem)
-    {
-        if ((slotIndex >= 0) && (slotIndex < playerSequence.Count))
+        mstate = MinigameState.PLAYING;
+        Item[] newSequence = GenerateNewPuzzleSequence();
+        foreach (Item item in newSequence)
         {
-            playerSequence[slotIndex] = selectedItem;
+            Debug.Log("Generated item: " + item.name);
         }
+        bookshelf.UpdateShelf(newSequence);
     }
-
+    
     public void Evaluate()
     {
-        bool correctMatch = true;
-
-        for (int i = 0; i < memeorizedSequence.Count; i++)
+        if (bookshelf.Evaluate())
         {
-            if (playerSequence.Count <= i || playerSequence[i] != memeorizedSequence[i])
-            {
-                correctMatch = false;
-                break;
-            }
-        }
-
-        if (correctMatch)
-        {
-            Debug.Log("Player won!");
+            mstate = MinigameState.SUCCESS;
         }
         else
         {
-            Debug.Log("Player lost!");
+            mstate = MinigameState.FAILURE;
         }
-
     }
-    
+
+    public void ShowResults()
+    {
+        if(mstate == MinigameState.SUCCESS)
+        {
+            Debug.Log("You win!");
+        }
+        else if(mstate == MinigameState.FAILURE)
+        {
+            Debug.Log("You lose!");
+        }
+    }
 }

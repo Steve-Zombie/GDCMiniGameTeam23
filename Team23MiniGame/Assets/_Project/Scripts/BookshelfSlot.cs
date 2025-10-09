@@ -12,16 +12,21 @@ public class BookshelfSlot : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         GameObject dropped = eventData.pointerDrag;
-        Debug.Log(dropped);
         DraggableItem dItem = dropped.GetComponent<DraggableItem>();
-        curr_item = dItem.Item;
-        UpdateSprite(curr_item.sprite);
+        UpdateItem(dItem.Item);
     }
 
-    public void UpdateSprite(Sprite sprite)
+    public void UpdateItem(Item item)
     {
-        if (sprite == null) return;
+        if (item == null)
+        {
+            Debug.Log("NULLING " + name);
+            curr_item = null;
+            gameObject.GetComponent<Image>().sprite = null;
+            return;
+        }
 
-        gameObject.GetComponent<Image>().sprite = sprite;
+        curr_item = item;
+        gameObject.GetComponent<Image>().sprite = item.sprite;
     }
 }

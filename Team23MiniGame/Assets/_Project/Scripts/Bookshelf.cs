@@ -1,5 +1,3 @@
-using Microsoft.Unity.VisualStudio.Editor;
-using NUnit.Framework.Constraints;
 using UnityEngine;
 
 public class Bookshelf : MonoBehaviour
@@ -12,7 +10,7 @@ public class Bookshelf : MonoBehaviour
     {
         for (int i = 0; i < slots.Length; i++)
         {
-            slots[i].curr_item = null;
+            slots[i].UpdateItem(null);
         }
     }
 
@@ -25,7 +23,7 @@ public class Bookshelf : MonoBehaviour
         {
             for (int i = 0; i < slots.Length; i++)
             {
-                slots[i].curr_item = items[i];
+                slots[i].UpdateItem(items[i]);
             }
         }
     }
