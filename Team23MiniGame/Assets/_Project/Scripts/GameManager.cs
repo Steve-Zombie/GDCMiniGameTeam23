@@ -6,100 +6,80 @@ using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private enum MinigameState
+    {
+        READY,
+        PLAYING,
+        SUCCESS,
+        FAILURE
+    }
 
-    private List<Item> avaliableItems;
+    private MinigameState mstate = MinigameState.READY;
+
+    public GameObject youWin;
+    public GameObject youLoose;
+    public GameObject introScreen;
+
+    public List<Item> availableItems;
     public Bookshelf bookshelf;
-    public Hotbar hotbar;
 
-    private List<Item> memeorizedSequence = new List<Item>();
-    private List<Item> playerSequence = new List<Item>();
-
-    private TimerManager timerManager;
-
-    void Awake()
+    private Item[] GenerateNewPuzzleSequence()
     {
-        timerManager = FindFirstObjectByType<TimerManager>();
-
-        if (timerManager != null)
-        {
-            Debug.LogError("Timer Not Found");
-        }
-    }
-
-    void Start()
-    {
-        GenerateNewPuzzleSequence();
-        bookshelf.UpdateShelf(memeorizedSequence.ToArray());
-        playerSequence.Clear();
-        hotbar.Show(false);
-    }
-
-
-    void GenerateNewPuzzleSequence()
-    {
-        memeorizedSequence.Clear();
-        playerSequence.Clear();
-
-        List<int> usedIndexes = new List<int>();
         int count = bookshelf.slots.Length;
-        
-        while (memeorizedSequence.Count < count)
+        Item[] res = new Item[count];
+
+        for (int i = 0; i < count; i++)
         {
-            int randomIndex = Random.Range(0, avaliableItems.Count);
-            if (!usedIndexes.Contains(randomIndex))
-            {
-                usedIndexes.Add(randomIndex);
-                memeorizedSequence.Add(avaliableItems[randomIndex]);
-            }
+            int randomIndex = Random.Range(0, availableItems.Count);
+            res[i] = availableItems[randomIndex];
         }
+
+        return res;
     }
 
-    public void OnMemorizationEnd()
+    public void OnIntro()
     {
-        bookshelf.ClearShelf();
-        hotbar.Show(true);
-        playerSequence = new List<Item>(new Item[bookshelf.slots.Length]);
-        timerManager.StartTimers(1);
+        introScreen.SetActive(true);
+
     }
 
-    public void OnInputEnd()
+    public void OnMemorizationStart()
     {
-        hotbar.Show(false);
-        Evaluate();
-    }
-
-
-    public void UpdatePlayerSequence(int slotIndex, Item selectedItem)
-    {
-        if ((slotIndex >= 0) && (slotIndex < playerSequence.Count))
+        introScreen.SetActive(false);
+        mstate = MinigameState.PLAYING;
+        Item[] newSequence = GenerateNewPuzzleSequence();
+        foreach (Item item in newSequence)
         {
-            playerSequence[slotIndex] = selectedItem;
+            Debug.Log("Generated item: " + item.name);
         }
+        bookshelf.UpdateShelf(newSequence);
     }
-
+    
     public void Evaluate()
     {
-        bool correctMatch = true;
-
-        for (int i = 0; i < memeorizedSequence.Count; i++)
+        if (bookshelf.Evaluate())
         {
-            if (playerSequence.Count <= i || playerSequence[i] != memeorizedSequence[i])
-            {
-                correctMatch = false;
-                break;
-            }
-        }
-
-        if (correctMatch)
-        {
-            Debug.Log("Player won!");
+            mstate = MinigameState.SUCCESS;
         }
         else
         {
-            Debug.Log("Player lost!");
+            mstate = MinigameState.FAILURE;
         }
-
     }
-    
+
+    public void ShowResults()
+    {
+        if(mstate == MinigameState.SUCCESS)
+        {
+            Debug.Log("You win!");
+            youWin.SetActive(true);
+
+        }
+        else if(mstate == MinigameState.FAILURE)
+        {
+            Debug.Log("You lose!");
+            youLoose.SetActive(true);
+
+        }
+    }
 }
