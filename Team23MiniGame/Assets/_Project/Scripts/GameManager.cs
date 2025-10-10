@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour
 
     private MinigameState mstate = MinigameState.READY;
 
+    public GameObject youWin;
+    public GameObject youLoose;
+    public GameObject introScreen;
+
     public List<Item> availableItems;
     public Bookshelf bookshelf;
 
@@ -33,8 +37,15 @@ public class GameManager : MonoBehaviour
         return res;
     }
 
+    public void OnIntro()
+    {
+        introScreen.SetActive(true);
+
+    }
+
     public void OnMemorizationStart()
     {
+        introScreen.SetActive(false);
         mstate = MinigameState.PLAYING;
         Item[] newSequence = GenerateNewPuzzleSequence();
         foreach (Item item in newSequence)
@@ -61,10 +72,14 @@ public class GameManager : MonoBehaviour
         if(mstate == MinigameState.SUCCESS)
         {
             Debug.Log("You win!");
+            youWin.SetActive(true);
+
         }
         else if(mstate == MinigameState.FAILURE)
         {
             Debug.Log("You lose!");
+            youLoose.SetActive(true);
+
         }
     }
 }
