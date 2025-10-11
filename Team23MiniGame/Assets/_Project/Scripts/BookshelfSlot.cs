@@ -8,6 +8,8 @@ public class BookshelfSlot : MonoBehaviour, IDropHandler
 {
     public Item curr_item;
 
+    public Sprite transparentSprite;
+
     // recieve item when dropped in
     public void OnDrop(PointerEventData eventData)
     {
@@ -22,7 +24,7 @@ public class BookshelfSlot : MonoBehaviour, IDropHandler
         {
             Debug.Log("NULLING " + name);
             curr_item = null;
-            gameObject.GetComponent<Image>().sprite = null;
+            gameObject.GetComponent<Image>().sprite = transparentSprite;
             return;
         }
 
